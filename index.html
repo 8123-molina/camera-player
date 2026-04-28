@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Camera LiveNow</title>
-
+<title>Camera PTZ</title>
 <style>
 html,body{
     margin:0;
@@ -14,24 +13,22 @@ html,body{
     background:#000;
     overflow:hidden;
 }
-
 #video{
     width:100vw;
     height:100vh;
     object-fit:contain;
     background:#000;
 }
-
 #msg{
     position:fixed;
     top:10px;
     left:10px;
     z-index:99;
     color:#fff;
-    background:rgba(0,0,0,.55);
+    background:rgba(0,0,0,.6);
     padding:8px 12px;
     border-radius:8px;
-    font-family:Arial,sans-serif;
+    font-family:Arial, sans-serif;
     font-size:14px;
 }
 </style>
@@ -39,69 +36,37 @@ html,body{
 <body>
 
 <div id="msg">Conectando câmera...</div>
-
-<video
-id="video"
-autoplay
-muted
-playsinline
-></video>
+<video id="video" autoplay muted playsinline controls></video>
 
 <script src="https://cdn.jsdelivr.net/npm/flv.js/dist/flv.min.js"></script>
 
 <script>
-(function(){
-
-const msg   = document.getElementById("msg");
 const video = document.getElementById("video");
+const msg   = document.getElementById("msg");
 
-const params = new URLSearchParams(window.location.search);
+const streamUrl = "http://192.168.18.107:30080/live/stream1.live.flv";
 
-const ip     = (params.get("ip") || "192.168.18.107").trim();
-const port   = (params.get("port") || "30080").trim();
-const stream = (params.get("stream") || "stream1").trim();
+if (flvjs.isSupported()) {
 
-const streamUrl = `http://${ip}:${port}/live/${stream}.live.flv`;
+    const player = flvjs.createPlayer({
+        type: 'flv',
+        url: streamUrl,
+        isLive: true
+    });
 
-msg.innerHTML = "Conectando...";
+    player.attachMediaElement(video);
+    player.load();
 
-if (!flvjs.isSupported()) {
+    player.play().then(()=>{
+        msg.innerHTML = "Câmera conectada";
+        setTimeout(()=>msg.style.display='none',2000);
+    }).catch(()=>{
+        msg.innerHTML = "Toque no play";
+    });
+
+} else {
     msg.innerHTML = "Navegador incompatível";
-    return;
 }
-
-const player = flvjs.createPlayer(
-{
-    type: 'flv',
-    url: streamUrl,
-    isLive: true
-},
-{
-    enableWorker: false,
-    enableStashBuffer: true,
-    stashInitialSize: 64,
-    lazyLoad: false,
-    autoCleanupSourceBuffer: true
-});
-
-player.attachMediaElement(video);
-player.load();
-
-player.play().then(function(){
-    msg.innerHTML = "Câmera conectada";
-    setTimeout(function(){
-        msg.style.display = "none";
-    }, 2000);
-}).catch(function(){
-    msg.innerHTML = "Carregado";
-});
-
-player.on(flvjs.Events.ERROR, function(type, detail){
-    console.log(type, detail);
-    msg.innerHTML = "Aguardando sinal...";
-});
-
-})();
 </script>
 
 </body>
