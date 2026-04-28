@@ -51,7 +51,7 @@ const msg   = document.getElementById("msg");
 const ip     = params.get("ip") || "192.168.18.107";
 const stream = params.get("stream") || "stream1";
 const port   = params.get("port") || "30080";
-
+alert(ip);
 const streamUrl = `http://${ip}:${port}/live/${stream}.live.flv`;
 
 if (flvjs.isSupported()) {
