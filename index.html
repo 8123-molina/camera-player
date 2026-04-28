@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Camera PTZ</title>
+
 <style>
 html,body{
     margin:0;
@@ -36,16 +37,20 @@ html,body{
 <body>
 
 <div id="msg">Conectando câmera...</div>
-<video id="video" autoplay muted playsinline controls></video>
+
+<video id="video" autoplay muted playsinline></video>
 
 <script src="https://cdn.jsdelivr.net/npm/flv.js/dist/flv.min.js"></script>
 
 <script>
+const params = new URLSearchParams(window.location.search);
+
 const video = document.getElementById("video");
 const msg   = document.getElementById("msg");
-const ip = params.get("ip") || "192.168.18.107";
+
+const ip     = params.get("ip") || "192.168.18.107";
 const stream = params.get("stream") || "stream1";
-const port = params.get("port") || "30080";
+const port   = params.get("port") || "30080";
 
 const streamUrl = `http://${ip}:${port}/live/${stream}.live.flv`;
 
@@ -62,9 +67,11 @@ if (flvjs.isSupported()) {
 
     player.play().then(()=>{
         msg.innerHTML = "Câmera conectada";
-        setTimeout(()=>msg.style.display='none',2000);
+        setTimeout(()=>{
+            msg.style.display = "none";
+        },2000);
     }).catch(()=>{
-        msg.innerHTML = "Toque no play";
+        msg.innerHTML = "Aguardando reprodução";
     });
 
 } else {
