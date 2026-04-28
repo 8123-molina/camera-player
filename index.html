@@ -43,39 +43,26 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/flv.js/dist/flv.min.js"></script>
 
 <script>
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(location.search);
 
-const video = document.getElementById("video");
-const msg   = document.getElementById("msg");
-
-const ip     = params.get("ip") || "192.168.18.107";
+const ip = params.get("ip") || "192.168.18.107";
+const port = params.get("port") || "30080";
 const stream = params.get("stream") || "stream1";
-const port   = params.get("port") || "30080";
-alert(ip);
+
 const streamUrl = `http://${ip}:${port}/live/${stream}.live.flv`;
 
 if (flvjs.isSupported()) {
+  const player = flvjs.createPlayer({
+    type:'flv',
+    url:streamUrl,
+    isLive:true
+  },{
+    enableStashBuffer:true
+  });
 
-    const player = flvjs.createPlayer({
-        type: 'flv',
-        url: streamUrl,
-        isLive: true
-    });
-
-    player.attachMediaElement(video);
-    player.load();
-
-    player.play().then(()=>{
-        msg.innerHTML = "Câmera conectada";
-        setTimeout(()=>{
-            msg.style.display = "none";
-        },2000);
-    }).catch(()=>{
-        msg.innerHTML = "Aguardando reprodução";
-    });
-
-} else {
-    msg.innerHTML = "Navegador incompatível";
+  player.attachMediaElement(document.getElementById("video"));
+  player.load();
+  player.play().catch(()=>{});
 }
 </script>
 
